@@ -4,7 +4,16 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "astroquery>=0.4.7",
+    "tzwhere",
+    "pytz",
+    "numpy",
+    "matplotlib",
+    "skyfield",
+    "geopy>=2.4.1",
+    "pandas>=2.2.3",
+]
 
 [build-system]
 requires = ["hatchling"]
