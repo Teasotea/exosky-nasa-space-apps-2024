@@ -29,7 +29,10 @@ class ExoplanetService:
         self.data_loader = data_loader
         self.vizualizer = vizualizer
 
-    def plot_exoplanet_projection(self, exoplanet_name: str, grid: bool = True):
+    def plot_exoplanet_projection(self, exoplanet_name: str, grid: bool = True, mollweide: bool = False, display_earth: bool = True):
+        if mollweide:
+            display_earth = False  # not supported in Mollweide projection
+
         df_gaia = self._stars_df
 
         if exoplanet_name == "Earth":
@@ -39,6 +42,7 @@ class ExoplanetService:
                 df_gaia["phot_g_mean_mag"].values,
                 df_gaia["bp_rp"].values,
                 grid,
+                mollweide,
             )
 
         # exoplanet = self.get_exoplanet(exoplanet_name)
@@ -49,6 +53,8 @@ class ExoplanetService:
             df_gaia["apparent_magnitude"].values,
             df_gaia["bp_rp"].values,
             grid,
+            mollweide,
+            earth=self._get_earth_position(exoplanet_name) if display_earth else None,
         )
 
     def get_exoplanets_within_distance(self, min_distance: Optional[float] = None, max_distance: Optional[float] = None) -> pd.DataFrame:
@@ -96,10 +102,17 @@ class ExoplanetService:
         df_gaia["apparent_magnitude"] = apparent_magnitude
         return df_gaia
 
+    def _get_earth_position(self, exoplanet_name):
+        exoplanet = self.get_exoplanet(exoplanet_name)
+        ra_earth = (exoplanet["ra"] + 180) % 360
+        dec_earth = -exoplanet["dec"]
+        return ra_earth, dec_earth, exoplanet["sy_dist"]
+
     @cached_property
     def _explanet_df(self):
         return self.data_loader.load_exoplanet_archive()
 
     @cached_property
     def _stars_df(self):
-        return self.data_loader.load_gaia_stars()
+        df = self.data_loader.load_gaia_stars()
+        return df
