@@ -1,17 +1,24 @@
-## HIGH-LEVEL SUMMARY
-Our project aims to bring a unique perspective to stargazing by allowing users to visualize the star sky from the view point of various exoplanets. Using data from the GAIA DR3 dataset and the NASA Exoplanet Archive, we've developed a Python web application that reprojects stars’ positions and characteristics based on an exoplanet's location.
+# Exosky! NASA Space Apps Challenge 2024
+
+A solution for [Exosky!](https://www.spaceappschallenge.org/nasa-space-apps-2024/challenges/exosky/?tab=details) challenge made by the team LazyVarenyky (@andrii0yerko, @Teasotea) during the NASA Space Apps Challenge 2024 hackathon, 5-6 October 2024.
+
+The solution was made in the form of a web application, that allows plotting 2D projection of the star sky from the perspective of various exoplanets from the NASA datasets.
 
 
 ## PROJECT DEMO
-N/A
-## FINAL PROJECT
-N/A
+
+- https://youtu.be/y_Ap1gsBJ70
+- https://www.spaceappschallenge.org/nasa-space-apps-2024/find-a-team/lazyvarenyky/?tab=project
+
 ## PROJECT DETAILS
+
+Our project aims to bring a unique perspective to stargazing by allowing users to visualize the star sky from the view point of various exoplanets. Using data from the GAIA DR3 dataset and the NASA Exoplanet Archive, we've developed a Python web application that reprojects stars’ positions and characteristics based on an exoplanet's location.
+![demo_2](https://github.com/user-attachments/assets/adc3331d-64d3-4772-a63c-fa2ef2441998)
 
 **Features**
 
-Our application features a set of tools for building the star sky vizualization in form of 2D plot:
-1. **Dynamic Sky Projection**: Visualizes the star sky from either Earth or an exoplanet's perspective, with a choice between Mollweide or Mercator projections.
+Our application features a set of tools for building the star sky vizualization in the form of a 2D plot:
+1. **Dynamic Sky Projection**: Visualizes the star sky from either Earth's or an exoplanet's perspective, with a choice between Mollweide or Mercator projections.
 2. **Exoplanet Filtering**: Filters the list of exoplanets by their distance from the Solar System, helping users focus on planets within a specific range.
 3. **Earth's Position Indicator**: Shows the Earth's location when viewing the star sky from other exoplanets.
 4. **Interactive Constellation Drawing**: Allows users to map constellations interactively on the star sky.
@@ -39,7 +46,7 @@ To elevate the user experience and scientific accuracy, the next steps will be t
 
 ## USE OF ARTIFICIAL INTELLIGENCE
 
-We used ChatGPT & Github copilot for development acceleration
+We used ChatGPT & Github Copilot for development acceleration
 
 ## SPACE AGENCY DATA
 
