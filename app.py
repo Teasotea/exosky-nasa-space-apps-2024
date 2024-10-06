@@ -216,9 +216,22 @@ if st.session_state["is_planet_selected"][0] and st.session_state["drawing_mode"
     )
     st.title("Create Your Constellation 🌟")
 
+    n = st.sidebar.number_input(
+        "Enter N — number of brightest stars to display (recommended: 10 to 1000):",
+        min_value=0,
+        max_value=10000,
+        value=100,
+    )
+    # n = st.sidebar.slider(
+    #     "Enter N — number of brightest stars to display (from 5 to 10000):",
+    #     min_value=5,
+    #     max_value=10000,
+    #     value=100,
+    # )
+
     stars = service.get_exoplanet_projection(st.session_state["is_planet_selected"][1])
     stars = stars.dropna(subset=["new_ra", "new_dec", "apparent_magnitude"])
-    stars = stars.nsmallest(100, "apparent_magnitude")
+    stars = stars.nsmallest(n, "apparent_magnitude")
     stars = stars[["SOURCE_ID", "new_ra", "new_dec", "apparent_magnitude"]]
     stars["s"] = stars["apparent_magnitude"].apply(lambda x: 35 * 10 ** (x / -2.5))
     stars = stars.reset_index(drop=True)

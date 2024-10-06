@@ -8,7 +8,9 @@ class MollweideVizualizer:
 
     def __init__(self, magnitude_treshold: float = 10):
         self.cmap = plt.get_cmap("coolwarm")  # A colormap going from blue to red
-        self.norm = plt.Normalize(vmin=-5, vmax=7)  # Normalize 'bp_rp' values for color mapping
+        self.norm = plt.Normalize(
+            vmin=-5, vmax=7
+        )  # Normalize 'bp_rp' values for color mapping
         self.magnitude_treshold = magnitude_treshold
 
     def plot(
@@ -61,7 +63,11 @@ class MollweideVizualizer:
         # ax.set_title("Star Map from Gaia Data (Mollweide Projection)", color="black")
 
         # Adjust axis labels and ticks to white to contrast with the dark projection background
-        ax.set_xticks(np.radians([-180, -150, -120, -90, -60, -30, 0, 30, 60, 90, 120, 150, 180][::1]))
+        ax.set_xticks(
+            np.radians(
+                [-180, -150, -120, -90, -60, -30, 0, 30, 60, 90, 120, 150, 180][::1]
+            )
+        )
         ax.set_yticks(np.radians([-80, -60, -40, -20, 0, 20, 40, 60, 80][::1]))
         ax.xaxis.label.set_color("white")
         ax.yaxis.label.set_color("white")
@@ -72,7 +78,9 @@ class MollweideVizualizer:
         if earth:
             axins = self._add_earth_subplot(ax, earth)
 
-            earth_mag = 4.83 - 5 + 5 * np.log10(earth[2])  # 4.83 is a sun absolute magnitude
+            earth_mag = (
+                4.83 - 5 + 5 * np.log10(earth[2])
+            )  # 4.83 is a sun absolute magnitude
 
             axins.scatter(
                 np.radians(earth[0]),
@@ -122,7 +130,13 @@ class MollweideVizualizer:
             xticklabels=[],
             yticklabels=[],
         )
-        circle = Circle(np.radians(earth[:2]), np.radians(0.25), fill=False, color="red", linewidth=3)
+        circle = Circle(
+            np.radians(earth[:2]),
+            np.radians(0.25),
+            fill=False,
+            color="red",
+            linewidth=3,
+        )
 
         axins.add_patch(circle)
 
@@ -155,7 +169,9 @@ class MollweideVizualizer:
                         x=[star1["new_ra"], star2["new_ra"]],
                         y=[star1["new_dec"], star2["new_dec"]],
                         mode="lines",
-                        line=dict(color="yellow", width=2),  # Connection lines in yellow
+                        line=dict(
+                            color="yellow", width=2
+                        ),  # Connection lines in yellow
                         name="Constellation",
                     )
                 )
@@ -174,7 +190,11 @@ class MollweideVizualizer:
         )
 
         # Set x and y axis properties for better visibility
-        fig.update_xaxes(showgrid=True, gridcolor="gray", zerolinecolor="gray")  # Optional: add gridlines for clarity
-        fig.update_yaxes(showgrid=True, gridcolor="gray", zerolinecolor="gray")  # Optional: add gridlines for clarity
+        fig.update_xaxes(
+            showgrid=True, gridcolor="gray", zerolinecolor="gray"
+        )  # Optional: add gridlines for clarity
+        fig.update_yaxes(
+            showgrid=True, gridcolor="gray", zerolinecolor="gray"
+        )  # Optional: add gridlines for clarity
 
         return fig
