@@ -19,6 +19,10 @@ if "selected_stars" not in st.session_state:
     st.session_state["selected_stars"] = []
 
 
+if "selected_stars" not in st.session_state:
+    st.session_state["selected_stars"] = []
+
+
 def enable_drawing_mode():
     """Enable or disable drawing mode."""
     if st.session_state["drawing_mode"]:
@@ -41,7 +45,9 @@ Enjoy exploring the universe! 🌌
 """
     )
     st.title("Look at the Sky from Earth 🌍 ")
-    fig, ax = service.plot_exoplanet_projection("Earth")
+    grid = st.checkbox("Show grid", value=True)
+    mollwide = st.checkbox("Mollwide", value=False)
+    fig, _ = service.plot_exoplanet_projection("Earth", grid=grid, mollweide=mollwide)
     st.pyplot(fig)
     st.write("Do you want to see the sky from other planet`s perspective?")
     st.markdown("Follow this **demo simulation** for that.")
@@ -168,11 +174,20 @@ if is_view_sky:
     st.session_state["is_planet_selected"] = [True, selected_exoplanet]
 
 if st.session_state["is_planet_selected"][0]:
-    st.write(
+    st.title(
         f"💫 **Sky Perspective from Exoplanet {st.session_state['is_planet_selected'][1]}**"
     )
-    fig, ax = service.plot_exoplanet_projection(
-        st.session_state["is_planet_selected"][1]
+    grid = st.checkbox("Show grid", value=True)
+    mollwide = st.checkbox("Mollwide", value=False)
+    if not mollwide:
+        show_earth = st.checkbox("Show Earth", value=True)
+    else:
+        show_earth = False
+    fig, _ = service.plot_exoplanet_projection(
+        st.session_state["is_planet_selected"][1],
+        grid=grid,
+        mollweide=mollwide,
+        display_earth=show_earth,
     )
     st.pyplot(fig)
 
@@ -183,63 +198,48 @@ if not distance_chosen and not st.session_state["is_planet_selected"][0]:
 
 # Drawing Mode --------------------------------------------------------------------------------
 
-# Button to toggle drawing mode
-if st.session_state["is_planet_selected"][0] and not st.session_state["drawing_mode"]:
-    st.button("Enable Drawing Mode", on_click=enable_drawing_mode)
 
-if st.session_state["drawing_mode"]:
-    st.markdown(
-        '<span style="color:blue;">**Drawing Mode Enabled**: Click on stars to create constellations</span>',
-        unsafe_allow_html=True,
-    )
-
-# --------------------------------------------------------------------------------
-# Simulating star positions for example purposes (replace this with real star data)
-
-# Simulated star data (replace with real star data from your app)
-
-st.title("Create Your Constellation 🌟")
-if st.session_state["is_planet_selected"][1] != "":
-    stars = service.get_exoplanet_projection(st.session_state["is_planet_selected"][1])
-    stars = stars.dropna(subset=["new_ra", "new_dec", "apparent_magnitude"])
-    stars = stars.nsmallest(100, "apparent_magnitude")
-    stars = stars[["SOURCE_ID", "new_ra", "new_dec", "apparent_magnitude"]]
-    stars["s"] = stars["apparent_magnitude"].apply(lambda x: 35 * 10 ** (x / -2.5))
-    stars = stars.reset_index(drop=True)
-    st.dataframe(stars)
-
-# Initialize session state for drawing
-if "selected_stars" not in st.session_state:
-    st.session_state["selected_stars"] = []
-
-# Sidebar to select stars
 st.sidebar.title("Create Your Constellation")
-st.write(
-    "Here you can see 100 most bright stars from the exoplanet perspective. You can create constellations from them."
-)
 if not st.session_state["drawing_mode"]:
     st.sidebar.markdown(
         '<span style="color:red;">Please enable draw mode to create your constellation.</span>',
         unsafe_allow_html=True,
     )
 
-# Dropdown to select stars from the exoplanet DataFrame
-selected_star = st.sidebar.selectbox(
-    "Select a star (exoplanet) to add to the constellation:", stars["SOURCE_ID"]
-)
+if st.session_state["is_planet_selected"][0] and not st.session_state["drawing_mode"]:
+    st.sidebar.button("Enable Drawing Mode", on_click=enable_drawing_mode)
 
-# Add selected star to the list of stars if the "Add" button is clicked
-if st.sidebar.button("Add Star"):
-    if selected_star not in st.session_state["selected_stars"]:
+if st.session_state["is_planet_selected"][0] and st.session_state["drawing_mode"]:
+    st.sidebar.markdown(
+        '<span style="color:blue;">Here you can choose the brightest stars from the exoplanet perspective and create constellations from them.</span>',
+        unsafe_allow_html=True,
+    )
+    st.title("Create Your Constellation 🌟")
+
+    stars = service.get_exoplanet_projection(st.session_state["is_planet_selected"][1])
+    stars = stars.dropna(subset=["new_ra", "new_dec", "apparent_magnitude"])
+    stars = stars.nsmallest(100, "apparent_magnitude")
+    stars = stars[["SOURCE_ID", "new_ra", "new_dec", "apparent_magnitude"]]
+    stars["s"] = stars["apparent_magnitude"].apply(lambda x: 35 * 10 ** (x / -2.5))
+    stars = stars.reset_index(drop=True)
+    # st.dataframe(stars)
+
+    selected_star = st.sidebar.selectbox(
+        "Select a star (exoplanet) to add to the constellation:", stars["SOURCE_ID"]
+    )
+
+    add_star = st.sidebar.button("Add Star")
+    if add_star and selected_star not in st.session_state["selected_stars"]:
         st.session_state["selected_stars"].append(selected_star)
+        add_star = None
 
-# Display the list of selected stars in the sidebar
-st.sidebar.write("Selected stars for the constellation:")
-st.sidebar.write(st.session_state["selected_stars"])
+    st.sidebar.write("Selected stars for the constellation:")
+    st.sidebar.write(st.session_state["selected_stars"])
 
-# Option to clear the constellation
-if st.sidebar.button("Clear Constellation"):
-    st.session_state["selected_stars"] = []
+    is_clear = st.sidebar.button("Clear Constellation")
+    if is_clear:
+        st.session_state["selected_stars"] = []
+        is_clear = None
 
-fig = service.plot_star_chart(stars, st.session_state["selected_stars"])
-st.plotly_chart(fig)
+    fig = service.plot_star_chart(stars, st.session_state["selected_stars"])
+    st.plotly_chart(fig)
