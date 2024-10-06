@@ -1,5 +1,3 @@
-import numpy as np
-import plotly.graph_objects as go
 import streamlit as st
 
 from exosky.query import DataLoader
@@ -200,125 +198,19 @@ if st.session_state["drawing_mode"]:
 
 # Simulated star data (replace with real star data from your app)
 
-
-def calculate_star_sizes(df, magnitude_threshold=-7):
-    mag_arr = df["apparent_magnitude"].to_numpy()
-    bright_stars = mag_arr < magnitude_threshold
-    sun = mag_arr < -7
-    filtered_mag_arr = mag_arr[bright_stars & ~sun]
-    size = np.exp(4 - filtered_mag_arr)  # Exponential scaling
-    size = np.clip(size, 0, 100)  # Clipping sizes to a maximum of 100
-    df["s"] = np.nan
-    df.loc[bright_stars & ~sun, "s"] = size
-    return df
-
-
 st.title("Create Your Constellation 🌟")
 if st.session_state["is_planet_selected"][1] != "":
     stars = service.get_exoplanet_projection(st.session_state["is_planet_selected"][1])
     stars = stars.dropna(subset=["new_ra", "new_dec", "apparent_magnitude"])
     stars = stars.nsmallest(100, "apparent_magnitude")
     stars = stars[["SOURCE_ID", "new_ra", "new_dec", "apparent_magnitude"]]
-    calculate_star_sizes(stars)
+    stars["s"] = stars["apparent_magnitude"].apply(lambda x: 35 * 10 ** (x / -2.5))
     stars = stars.reset_index(drop=True)
     st.dataframe(stars)
 
 # Initialize session state for drawing
 if "selected_stars" not in st.session_state:
     st.session_state["selected_stars"] = []
-
-
-# def plot_star_chart(df, selected_stars):
-#     """Plot the star chart and handle drawing mode."""
-#     fig = go.Figure()
-
-#     # Plot stars as scatter plot based on real exoplanet data
-#     fig.add_trace(
-#         go.Scatter(
-#             x=df["new_ra"],  # Right Ascension
-#             y=df["new_dec"],  # Declination
-#             mode="markers",
-#             marker=dict(size=10, color="yellow"),
-#             text=df["SOURCE_ID"],  # Exoplanet names
-#             name="Stars",
-#         )
-#     )
-
-#     # Draw lines between selected stars
-#     if len(selected_stars) > 1:
-#         for i in range(len(selected_stars) - 1):
-#             star1 = df[df["SOURCE_ID"] == selected_stars[i]].iloc[0]
-#             star2 = df[df["SOURCE_ID"] == selected_stars[i + 1]].iloc[0]
-#             fig.add_trace(
-#                 go.Scatter(
-#                     x=[star1["new_ra"], star2["new_ra"]],
-#                     y=[star1["new_dec"], star2["new_dec"]],
-#                     mode="lines",
-#                     line=dict(color="blue", width=2),
-#                     name="Constellation",
-#                 )
-#             )
-
-#     fig.update_layout(
-#         xaxis_title="Right Ascension",
-#         yaxis_title="Declination",
-#         title="Exoplanet Star Chart",
-#     )
-#     return fig
-
-
-def plot_star_chart(df, selected_stars):
-    """Plot the star chart and handle drawing mode."""
-    fig = go.Figure()
-
-    # Plot stars as scatter plot based on real exoplanet data
-    fig.add_trace(
-        go.Scatter(
-            x=df["new_ra"],  # Right Ascension
-            y=df["new_dec"],  # Declination
-            mode="markers",
-            marker=dict(size=df["s"], color="white"),  # Size depends on 's' column
-            text=df["source_id"],  # Exoplanet names
-            name="Stars",
-        )
-    )
-
-    # Draw lines between selected stars
-    if len(selected_stars) > 1:
-        for i in range(len(selected_stars) - 1):
-            star1 = df[df["source_id"] == selected_stars[i]].iloc[0]
-            star2 = df[df["source_id"] == selected_stars[i + 1]].iloc[0]
-            fig.add_trace(
-                go.Scatter(
-                    x=[star1["new_ra"], star2["new_ra"]],
-                    y=[star1["new_dec"], star2["new_dec"]],
-                    mode="lines",
-                    line=dict(color="yellow", width=2),  # Connection lines in yellow
-                    name="Constellation",
-                )
-            )
-
-    # Update layout for the figure
-    fig.update_layout(
-        xaxis_title="Right Ascension",
-        yaxis_title="Declination",
-        title="Exoplanet Star Chart",
-        plot_bgcolor="darkblue",  # Dark blue background
-        paper_bgcolor="darkblue",  # Dark blue for the paper background
-        font=dict(color="white"),  # White font color for titles and labels
-        showlegend=True,  # Show legend
-    )
-
-    # Set x and y axis properties for better visibility
-    fig.update_xaxes(
-        showgrid=True, gridcolor="gray", zerolinecolor="gray"
-    )  # Optional: add gridlines for clarity
-    fig.update_yaxes(
-        showgrid=True, gridcolor="gray", zerolinecolor="gray"
-    )  # Optional: add gridlines for clarity
-
-    return fig
-
 
 # Sidebar to select stars
 st.sidebar.title("Create Your Constellation")
@@ -349,5 +241,5 @@ st.sidebar.write(st.session_state["selected_stars"])
 if st.sidebar.button("Clear Constellation"):
     st.session_state["selected_stars"] = []
 
-# Plot the star chart with the selected stars and drawn lines
-st.plotly_chart(plot_star_chart(stars, st.session_state["selected_stars"]))
+fig = service.plot_star_chart(stars, st.session_state["selected_stars"])
+st.plotly_chart(fig)
