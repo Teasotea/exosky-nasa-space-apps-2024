@@ -29,7 +29,7 @@ class ExoplanetService:
         self.data_loader = data_loader
         self.vizualizer = vizualizer
 
-    def plot_exoplanet_projection(self, exoplanet_name: str):
+    def plot_exoplanet_projection(self, exoplanet_name: str, grid: bool = True):
         df_gaia = self._stars_df
 
         if exoplanet_name == "Earth":
@@ -38,6 +38,7 @@ class ExoplanetService:
                 df_gaia["dec"].values,
                 df_gaia["phot_g_mean_mag"].values,
                 df_gaia["bp_rp"].values,
+                grid,
             )
 
         exoplanet = self.get_exoplanet(exoplanet_name)
@@ -47,9 +48,12 @@ class ExoplanetService:
             df_gaia["new_dec"].values,
             df_gaia["apparent_magnitude"].values,
             df_gaia["bp_rp"].values,
+            grid,
         )
 
-    def get_exoplanets_within_distance(self, min_distance: Optional[float] = None, max_distance: Optional[float] = None) -> pd.DataFrame:
+    def get_exoplanets_within_distance(
+        self, min_distance: Optional[float] = None, max_distance: Optional[float] = None
+    ) -> pd.DataFrame:
         df_exoplanets = self._explanet_df
         if min_distance:
             df_exoplanets = df_exoplanets[df_exoplanets["sy_dist"] >= min_distance]
@@ -70,13 +74,17 @@ class ExoplanetService:
         star_coord = SkyCoord(
             ra=df_gaia["ra"].values * u.deg,
             dec=df_gaia["dec"].values * u.deg,
-            distance=Distance(parallax=df_gaia["parallax"].values * u.mas, allow_negative=True),
+            distance=Distance(
+                parallax=df_gaia["parallax"].values * u.mas, allow_negative=True
+            ),
         )
 
-        star_relative_position = star_coord.transform_to("icrs").represent_as(CartesianRepresentation) - exoplanet_coord.transform_to(
-            "icrs"
-        ).represent_as(CartesianRepresentation)
-        star_from_exoplanet = star_relative_position.represent_as(SphericalRepresentation)
+        star_relative_position = star_coord.transform_to("icrs").represent_as(
+            CartesianRepresentation
+        ) - exoplanet_coord.transform_to("icrs").represent_as(CartesianRepresentation)
+        star_from_exoplanet = star_relative_position.represent_as(
+            SphericalRepresentation
+        )
 
         # Calculate the translated distance
         new_dist = star_from_exoplanet.distance.to(u.parsec).value
@@ -84,7 +92,9 @@ class ExoplanetService:
         # Extract new RA and Dec
         new_ra = star_from_exoplanet.lon.deg
         new_dec = star_from_exoplanet.lat.deg
-        absolute_magnitude = df_gaia["phot_g_mean_mag"] + 5 - 5 * np.log10(1000 / df_gaia["parallax"])
+        absolute_magnitude = (
+            df_gaia["phot_g_mean_mag"] + 5 - 5 * np.log10(1000 / df_gaia["parallax"])
+        )
         apparent_magnitude = absolute_magnitude - 5 + 5 * np.log10(new_dist)
 
         df_gaia["new_ra"] = new_ra

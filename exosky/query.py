@@ -15,7 +15,7 @@ class DataLoader:
             # https://exoplanetarchive.ipac.caltech.edu/docs/API_PS_columns.html
             exoplanets = NasaExoplanetArchive.query_criteria(
                 table="PSCompPars",  # The new Planetary Systems (PS) table
-                select="pl_name, ra, dec, sy_dist, pl_orbincl, pl_orbsmax, st_mass, st_rad",
+                select="pl_name, sy_dist, ra, dec, pl_orbsmax, st_mass, st_rad",
                 where="sy_dist IS NOT NULL",
                 cache=True,
             )
