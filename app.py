@@ -6,9 +6,6 @@ from exosky.query import DataLoader
 from exosky.service import ExoplanetService
 from exosky.vizualizer import MollweideVizualizer
 
-# from astropy.coordinates import SkyCoord
-# from astropy import units as u
-
 service = ExoplanetService(DataLoader(), MollweideVizualizer())
 
 if "is_planet_selected" not in st.session_state:

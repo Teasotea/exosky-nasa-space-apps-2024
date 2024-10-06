@@ -13,6 +13,7 @@ dependencies = [
     "skyfield",
     "geopy>=2.4.1",
     "pandas>=2.2.3",
+    "streamlit>=1.39.0",
 ]
 
 [build-system]
