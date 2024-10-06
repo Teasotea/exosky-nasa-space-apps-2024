@@ -154,7 +154,7 @@ class MollweideVizualizer:
                 y=df["new_dec"],  # Declination
                 mode="markers",
                 marker=dict(size=df["s"], color="white"),  # Size depends on 's' column
-                text=df["SOURCE_ID"],  # Exoplanet names
+                text=df["name"],  # Exoplanet names
                 name="Stars",
             )
         )
@@ -162,8 +162,8 @@ class MollweideVizualizer:
         # Draw lines between selected stars
         if len(selected_stars) > 1:
             for i in range(len(selected_stars) - 1):
-                star1 = df[df["SOURCE_ID"] == selected_stars[i]].iloc[0]
-                star2 = df[df["SOURCE_ID"] == selected_stars[i + 1]].iloc[0]
+                star1 = df[df["name"] == selected_stars[i]].iloc[0]
+                star2 = df[df["name"] == selected_stars[i + 1]].iloc[0]
                 fig.add_trace(
                     go.Scatter(
                         x=[star1["new_ra"], star2["new_ra"]],

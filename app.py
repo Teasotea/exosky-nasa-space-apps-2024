@@ -1,3 +1,4 @@
+import plotly.io as pio
 import streamlit as st
 
 from exosky.query import DataLoader
@@ -232,13 +233,13 @@ if st.session_state["is_planet_selected"][0] and st.session_state["drawing_mode"
     stars = service.get_exoplanet_projection(st.session_state["is_planet_selected"][1])
     stars = stars.dropna(subset=["new_ra", "new_dec", "apparent_magnitude"])
     stars = stars.nsmallest(n, "apparent_magnitude")
-    stars = stars[["SOURCE_ID", "new_ra", "new_dec", "apparent_magnitude"]]
+    stars = stars[["name", "new_ra", "new_dec", "apparent_magnitude"]]
     stars["s"] = stars["apparent_magnitude"].apply(lambda x: 35 * 10 ** (x / -2.5))
     stars = stars.reset_index(drop=True)
     # st.dataframe(stars)
 
     selected_star = st.sidebar.selectbox(
-        "Select a star (exoplanet) to add to the constellation:", stars["SOURCE_ID"]
+        "Select a star (exoplanet) to add to the constellation:", stars["name"]
     )
 
     add_star = st.sidebar.button("Add Star")
@@ -256,3 +257,16 @@ if st.session_state["is_planet_selected"][0] and st.session_state["drawing_mode"
 
     fig = service.plot_star_chart(stars, st.session_state["selected_stars"])
     st.plotly_chart(fig)
+
+    const_name = st.sidebar.text_input("Like your constellation? Give it a name:")
+
+    if const_name:
+        st.sidebar.write(f"Do you want to save it as: {const_name}.png ?")
+
+        if st.sidebar.button("Save"):
+            # pio.write_image(fig, f"{const_name}.png")
+            st.success(f"Plot saved as {const_name}.png")
+
+
+if st.session_state["drawing_mode"]:
+    st.sidebar.button("Disable Drawing Mode", on_click=enable_drawing_mode)

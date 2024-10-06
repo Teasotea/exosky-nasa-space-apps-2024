@@ -3,6 +3,7 @@ import pathlib
 import pandas as pd
 from astroquery.gaia import Gaia
 from astroquery.nasa_exoplanet_archive import NasaExoplanetArchive
+from astroquery.simbad import Simbad
 
 
 class DataLoader:
@@ -27,6 +28,7 @@ class DataLoader:
         return df_exoplanets
 
     def load_gaia_stars(self, number: int = 100000) -> pd.DataFrame:
+
         cache_path = pathlib.Path("tmp/gaia_cache")
         if not cache_path.exists():
 
@@ -41,8 +43,29 @@ class DataLoader:
             )
             result = job.get_results()
             df = result.to_pandas()
+
+            # Add a 'name' column with default values as source_id
+            df["name"] = df["SOURCE_ID"].astype(str)
+
+            # Attempt to match with SIMBAD names
+            # df["name"] = df["SOURCE_ID"].apply(lambda x: self.match_star_name(str(x)))
+
             df.to_pickle(cache_path)
         else:
             df = pd.read_pickle(cache_path)
 
         return df
+
+    # def match_star_name(self, gaia_source_id: str) -> str:
+    #     try:
+    #         simbad_query = Simbad.query_object(f"Gaia DR3 {gaia_source_id}")
+    #         if simbad_query is not None and "MAIN_ID" in simbad_query.colnames:
+    #             return simbad_query["MAIN_ID"][
+    #                 0
+    #             ]  # Return the main ID (common star name)
+    #     except Exception as e:
+    #         # Handle any issues like network failures or parsing problems
+    #         print(f"Error querying SIMBAD for Gaia DR3 {gaia_source_id}: {e}")
+
+    #     # If no name found, return the Gaia source_id
+    #     return gaia_source_id
