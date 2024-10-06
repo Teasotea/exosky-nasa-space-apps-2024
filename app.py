@@ -4,10 +4,6 @@ from exosky.query import DataLoader
 from exosky.service import ExoplanetService
 from exosky.vizualizer import MollweideVizualizer
 
-# import plotly.graph_objects as go
-# from astropy.coordinates import SkyCoord
-# from astropy import units as u
-
 service = ExoplanetService(DataLoader(), MollweideVizualizer())
 
 if "is_planet_selected" not in st.session_state:
@@ -62,20 +58,14 @@ distance_chosen = st.sidebar.button("Find nearest exoplanets")
 
 if chosen_distance and not st.session_state["is_distance_chosen"][0]:
     st.sidebar.markdown(
-        '<span style="color:blue;">Click the '
-        "Find nearest exoplanets"
-        " button to apply your changes.</span>",
+        '<span style="color:blue;">Click the ' "Find nearest exoplanets" " button to apply your changes.</span>",
         unsafe_allow_html=True,
     )
 
 if distance_chosen:
     with st.spinner("Searching for your exoplanets..."):
-        nearest_exoplanets = service.get_exoplanets_within_distance(
-            chosen_distance[0], chosen_distance[1]
-        )
-        nearest_exoplanets = nearest_exoplanets.sort_values(by="sy_dist").reset_index(
-            drop=True
-        )
+        nearest_exoplanets = service.get_exoplanets_within_distance(chosen_distance[0], chosen_distance[1])
+        nearest_exoplanets = nearest_exoplanets.sort_values(by="sy_dist").reset_index(drop=True)
 
     st.sidebar.markdown(
         f"Number of exoplanets within {chosen_distance} parsecs: <span style='color:red'>{len(nearest_exoplanets)}</span>",
@@ -87,14 +77,8 @@ if distance_chosen:
         unsafe_allow_html=True,
     )
 
-    st.markdown(
-        "Select an exoplanet in the **sidebar** to explore 🔭  the stars around it."
-    )
-    st.dataframe(
-        nearest_exoplanets[
-            ["pl_name", "sy_dist", "ra", "dec", "pl_orbsmax", "st_mass", "st_rad"]
-        ]
-    )
+    st.markdown("Select an exoplanet in the **sidebar** to explore 🔭  the stars around it.")
+    st.dataframe(nearest_exoplanets[["pl_name", "sy_dist", "ra", "dec", "pl_orbsmax", "st_mass", "st_rad"]])
 
     st.markdown(
         """
@@ -118,10 +102,7 @@ if not st.session_state["is_distance_chosen"][0]:
         '<span style="color:red;">Please complete all steps above to view sky perspective from exoplanet.</span>',
         unsafe_allow_html=True,
     )
-elif (
-    st.session_state["is_distance_chosen"][0]
-    and not st.session_state["is_planet_selected"][0]
-):
+elif st.session_state["is_distance_chosen"][0] and not st.session_state["is_planet_selected"][0]:
     st.sidebar.markdown(
         '<span style="color:blue;">Select an exoplanet to view the sky perspective.</span>',
         unsafe_allow_html=True,
@@ -139,9 +120,7 @@ else:
 
 if st.session_state["is_distance_chosen"][0] and not is_view_sky:
     st.sidebar.markdown(
-        '<span style="color:blue;">Click the '
-        "View Sky Perspective"
-        " button to apply your changes.</span>",
+        '<span style="color:blue;">Click the ' "View Sky Perspective" " button to apply your changes.</span>",
         unsafe_allow_html=True,
     )
 elif st.session_state["is_planet_selected"][0]:
@@ -156,12 +135,8 @@ if is_view_sky:
     st.session_state["is_planet_selected"] = [True, selected_exoplanet]
 
 if st.session_state["is_planet_selected"][0]:
-    st.write(
-        f"💫 **Sky Perspective from Exoplanet {st.session_state['is_planet_selected'][1]}**"
-    )
-    fig, ax = service.plot_exoplanet_projection(
-        st.session_state["is_planet_selected"][1]
-    )
+    st.write(f"💫 **Sky Perspective from Exoplanet {st.session_state['is_planet_selected'][1]}**")
+    fig, ax = service.plot_exoplanet_projection(st.session_state["is_planet_selected"][1])
     st.pyplot(fig)
 
 

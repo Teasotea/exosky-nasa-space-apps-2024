@@ -6,9 +6,7 @@ class MollweideVizualizer:
 
     def __init__(self, magnitude_treshold: float = 10):
         self.cmap = plt.get_cmap("coolwarm")  # A colormap going from blue to red
-        self.norm = plt.Normalize(
-            vmin=-5, vmax=7
-        )  # Normalize 'bp_rp' values for color mapping
+        self.norm = plt.Normalize(vmin=-5, vmax=7)  # Normalize 'bp_rp' values for color mapping
         self.magnitude_treshold = magnitude_treshold
 
     def plot(self, ra_arr, dec_arr, mag_arr, bp_rp_arr, grid: bool = True):
@@ -47,8 +45,8 @@ class MollweideVizualizer:
         )
 
         # Add labels and title
-        ax.set_xlabel("Right Ascension (degrees)", color="black")
-        ax.set_ylabel("Declination (degrees)", color="black")
+        # ax.set_xlabel("Right Ascension (degrees)", color="black")
+        # ax.set_ylabel("Declination (degrees)", color="black")
         # ax.set_title("Star Map from Gaia Data (Mollweide Projection)", color="black")
 
         # Adjust axis labels and ticks to white to contrast with the dark projection background
