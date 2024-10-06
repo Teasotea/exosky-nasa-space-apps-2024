@@ -148,6 +148,7 @@ elif (
         unsafe_allow_html=True,
     )
 
+
 if st.session_state["is_distance_chosen"][0]:
     selected_exoplanet = st.sidebar.selectbox(
         "Select an Exoplanet",
@@ -172,9 +173,17 @@ elif st.session_state["is_planet_selected"][0]:
         unsafe_allow_html=True,
     )
 
+
+planet1 = st.session_state["is_planet_selected"][1]
+
 if is_view_sky:
-    print(selected_exoplanet)
     st.session_state["is_planet_selected"] = [True, selected_exoplanet]
+
+planet2 = st.session_state["is_planet_selected"][1]
+
+if planet1 != planet2 and planet1 != "":
+    st.session_state["selected_stars"] = []
+    st.session_state["drawing_mode"] = False
 
 if st.session_state["is_planet_selected"][0]:
     st.title(
