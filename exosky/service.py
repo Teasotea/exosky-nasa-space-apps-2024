@@ -41,8 +41,8 @@ class ExoplanetService:
                 grid,
             )
 
-        exoplanet = self.get_exoplanet(exoplanet_name)
-        df_gaia = self.get_exoplanet_projection(df_gaia, exoplanet)
+        # exoplanet = self.get_exoplanet(exoplanet_name)
+        df_gaia = self.get_exoplanet_projection(exoplanet_name)
         return self.vizualizer.plot(
             df_gaia["new_ra"].values,
             df_gaia["new_dec"].values,
@@ -64,7 +64,9 @@ class ExoplanetService:
     def get_exoplanet(self, exoplanet_name: str):
         return self._explanet_df[self._explanet_df["pl_name"] == exoplanet_name].iloc[0]
 
-    def get_exoplanet_projection(self, df_gaia, exoplanet):
+    def get_exoplanet_projection(self, exoplanet_name):
+        exoplanet = self.get_exoplanet(exoplanet_name)
+        df_gaia = self._stars_df
         exoplanet_coord = SkyCoord(
             ra=exoplanet["ra"] * u.deg,
             dec=exoplanet["dec"] * u.deg,
