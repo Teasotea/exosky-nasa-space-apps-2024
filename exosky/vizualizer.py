@@ -16,15 +16,11 @@ class MollweideVizualizer:
         ax.grid(grid)
 
         # Using Mollweide projection for RA/DEC
-        ra_rad = np.radians(ra_arr - 180)  # Center the map at RA = 180°
+        ra_rad = np.radians(ra_arr - 180)
         dec_rad = np.radians(dec_arr)
 
         # Adjust star sizes with exponential scaling
-        size = np.exp(4 - mag_arr)  # Exponential scaling for sizes
-
-        # Create the subplot with Mollweide projection
-
-        # Set the face color of the projection (ellipse region) to deep blue
+        size = np.exp(4 - mag_arr)
         ax.set_facecolor("#000033")
 
         ax.scatter(ra_rad, dec_rad, s=size, c=bp_rp_arr, cmap=self.cmap, norm=self.norm, alpha=0.75)
