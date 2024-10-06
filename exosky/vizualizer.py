@@ -34,6 +34,6 @@ class MollweideVizualizer:
         ax.xaxis.label.set_color("white")
         ax.yaxis.label.set_color("white")
         ax.tick_params(axis="both", colors="white")
-        ax.set_xticks([])
-        ax.set_yticks([])
+        ax.xaxis.set_ticklabels([])
+        ax.yaxis.set_ticklabels([])
         return fig, ax
