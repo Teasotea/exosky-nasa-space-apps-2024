@@ -1,3 +1,5 @@
+import os
+
 import plotly.io as pio
 import streamlit as st
 
@@ -243,7 +245,7 @@ if st.session_state["is_planet_selected"][0] and st.session_state["drawing_mode"
     )
 
     add_star = st.sidebar.button("Add Star")
-    if add_star and selected_star not in st.session_state["selected_stars"]:
+    if add_star:  # and selected_star not in st.session_state["selected_stars"]:
         st.session_state["selected_stars"].append(selected_star)
         add_star = None
 
@@ -260,12 +262,48 @@ if st.session_state["is_planet_selected"][0] and st.session_state["drawing_mode"
 
     const_name = st.sidebar.text_input("Like your constellation? Give it a name:")
 
+    IMAGE_LIMIT = 5
+
+    images = [
+        img for img in os.listdir("const_img") if img.endswith(("png", "jpg", "jpeg"))
+    ]
+
     if const_name:
         st.sidebar.write(f"Do you want to save it as: {const_name}.png ?")
 
         if st.sidebar.button("Save"):
-            # pio.write_image(fig, f"{const_name}.png")
-            st.success(f"Plot saved as {const_name}.png")
+            if not os.path.exists("const_img"):
+                os.makedirs("const_img")
+            if len(images) < IMAGE_LIMIT:
+                pio.write_image(fig, f"const_img/{const_name}.png")
+                st.sidebar.success(f"Plot saved as {const_name}.png")
+            elif len(images) >= IMAGE_LIMIT:
+                st.sidebar.error(
+                    f"Cannot save more than {IMAGE_LIMIT} images. Please delete some images."
+                )
+
+        selected_images = st.sidebar.multiselect(
+            "Do you want to delete any saved constellations? (5 is max limit)",
+            options=images,
+        )
+        is_del_chosen = st.sidebar.button("Delete Images")
+        if is_del_chosen:
+            for image in selected_images:
+                image_path = os.path.join("const_img", image)
+                if os.path.exists(image_path):
+                    os.remove(image_path)
+                else:
+                    print(f"File not found: {image_path}")
+
+            st.sidebar.success("Selected_images deleted successfully.")
+            print(f"'{selected_images}' deleted successfully.")
+
+    if images:
+        if st.sidebar.button("Show Saved Constellations"):
+            st.title("Saved Constellations")
+            for image in images:
+                image_path = os.path.join("const_img", image)
+                st.image(image_path, caption=image)
 
 
 if st.session_state["drawing_mode"]:
