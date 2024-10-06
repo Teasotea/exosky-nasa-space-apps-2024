@@ -22,4 +22,14 @@ build-backend = "hatchling.build"
 [tool.uv]
 dev-dependencies = [
     "jupyter>=1.1.1",
+    "flake8-pyproject>=1.2.3",
 ]
+
+[tool.flake8]
+max-line-length = 140
+
+[tool.black]
+line-length = 140
+
+[tool.isort]
+profile = "black"
